@@ -2,7 +2,7 @@
     "*.ts?(x)": [
         "eslint --fix"
     ],
-    "*.{js,jsx,ts,tsx}": [
+    "*.{ts,tsx}": [
         "eslint --fix"
     ]
 }

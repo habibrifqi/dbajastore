@@ -1,4 +1,3 @@
-import { handleSumbit } from "@/lib/action/register";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { FormEvent, useState } from "react";
@@ -62,7 +61,7 @@ const RegisterView = () => {
 
   return (
     <div className="">
-      <form onSubmit={handleSumbit} className="max-w-sm mx-auto mt-44 border-collapse border-2 p-4">
+      <form onSubmit={handleSumbit} className="max-w-sm mx-auto mt-20 border-collapse border-2 p-4">
         <h1 className="text-3xl font-bold mb-5 text-center w-full">Register</h1>
         <div className="mb-5">
           <label

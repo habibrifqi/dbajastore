@@ -1,6 +1,6 @@
 import { addDoc, collection, doc, getDoc, getDocs, getFirestore, query, where } from "firebase/firestore";
 import app from "./init";
-import bcrypt from "bcrypt"
+import { boolean } from "zod";
 
 const firestore = getFirestore(app);
 
@@ -21,18 +21,10 @@ export async function retriveDataById(collectionName: string, id: string) {
     return data;
 }
 
-export async function signUp(userData: {
-    email: string,
-    fullname: string,
-    phone: string,
-    password: string,
-    role?: string
-}, callback: Function) {
-
-
+export async function retriveDataByField(collectionName: string, field: string, value:string) {
     const q = query(
-        collection(firestore, 'users'),
-        where('email', '==', userData.email),
+        collection(firestore, collectionName),
+        where(field, '==', value),
     );
 
     const snapshot = await getDocs(q);
@@ -43,78 +35,18 @@ export async function signUp(userData: {
         }
     ));
 
-    // jika ada data (usah ada email yg digunakan)
-    if (data.length > 0) {
+    return data
+}
+
+export async function addData(collectionName:string,data:any,callback:Function) {
+    await addDoc(collection(firestore, collectionName), data)
+    .then(() => {
+        callback(true);
+    })
+    .catch((error) => {
         callback(false)
-    } else {
-        // jiak tidak ada
-
-        // jika tidak punya role
-        if (!userData.role) {
-            userData.role = 'member'
-        }
-
-        // hash
-        userData.password = await bcrypt.hash(userData.password,10);
-
-        // simpan
-        await addDoc(collection(firestore, 'users'), userData)
-            .then(() => {
-                callback(true);
-            })
-            .catch((error) => {
-                callback(false)
-                console.log(error)
-            });
-    }
+        console.log(error)
+    });
+    
 }
 
-export async function signIn(
-    email: string,
-) {
-
-
-    const q = query(
-        collection(firestore, 'users'),
-        where('email', '==', email),
-    );
-
-    const snapshot = await getDocs(q);
-    const data = snapshot.docs.map((doc) => (
-        {
-            id: doc.id,
-            ...doc.data(),  
-        }
-    ));
-
-    // jika ada data (usah ada email yg digunakan)
-    if (data) {
-        return data[0];
-    }else{
-        return null
-    }
-}
-
-export async function loginWithGoogle(data:any, callback:Function) {
-    const q = query(
-        collection(firestore, 'users'),
-        where('email', '==', data.email),
-    );
-
-    const snapshot = await getDocs(q);
-    const user = snapshot.docs.map((doc) => (
-        {
-            id: doc.id,
-            ...doc.data(),  
-        }
-    ));
-
-    if (user.length > 0) {
-        callback(user[0])
-    }else{
-        data.role = 'member';
-        await addDoc(collection(firestore, 'users'),data).then(() =>{
-            callback(data);
-        })
-    }
-}

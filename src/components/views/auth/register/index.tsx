@@ -1,3 +1,5 @@
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { FormEvent, useState } from "react";
@@ -9,12 +11,15 @@ import {z} from "zod"
 const RegisterView = () => {
 
     const { push } = useRouter();
+    const [loading, setLoading] = useState(false);
+
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     const handleSumbit = async (event : FormEvent<HTMLElement>) => {
         const form = event.target as HTMLFormElement;
         event.preventDefault();
+        setLoading(true);
         const data ={
             email : form.email.value,
             username : form.username.value,
@@ -35,6 +40,7 @@ const RegisterView = () => {
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
+            setLoading(false);
             return;
         }
 
@@ -53,7 +59,17 @@ const RegisterView = () => {
             form.reset();
             push('/auth/login');
         }else{
-
+          const responseData = await result.json();
+          console.log(responseData.message);
+          if (result.status === 409) {
+            newErrors.password = 'Email Sudah digunakan';
+            data.password = ''; // Reset password if validation fails
+            form.password.value = '';
+            setErrors(newErrors);
+            setLoading(false);
+            return;
+          }
+          console.log(result)
         }
 
     }
@@ -63,7 +79,7 @@ const RegisterView = () => {
     <div className="">
       <form onSubmit={handleSumbit} className="max-w-sm mx-auto mt-20 border-collapse border-2 p-4">
         <h1 className="text-3xl font-bold mb-5 text-center w-full">Register</h1>
-        <div className="mb-5">
+        {/* <div className="mb-5">
           <label
             htmlFor="email"
             className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -77,8 +93,8 @@ const RegisterView = () => {
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="rifqierror.example.com"
           />
-        </div>
-        <div className="mb-5">
+        </div> */}
+        {/* <div className="mb-5">
           <label
             htmlFor="username"
             className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -91,8 +107,8 @@ const RegisterView = () => {
             name="username"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           />
-        </div>
-        <div className="mb-5">
+        </div> */}
+        {/* <div className="mb-5">
           <label
             htmlFor="phoneNumber"
             className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -105,8 +121,8 @@ const RegisterView = () => {
             name="phoneNumber"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           />
-        </div>
-        <div className="mb-5">
+        </div> */}
+        {/* <div className="mb-5">
           <label
             htmlFor="password"
             className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -119,8 +135,13 @@ const RegisterView = () => {
             name="password"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           />
-          {errors.password && <p style={{ color: 'red' }}>{errors.password}</p>}
-        </div>
+       
+        </div> */}
+        <Input label="Email Address" name="email" type="email" placeholder="Yourmail@example.com" />
+        <Input label="Username" name="username" type="text" placeholder="Username" />
+        <Input label="Phone Number" name="phoneNumber" type="number" placeholder="Phone Number" />
+        <Input label="Password" name="password" type="password" placeholder="Your Password" />
+        {errors.password && <p className="text-center" style={{ color: 'red' }}>{errors.password}</p>}
         <div className="flex justify-between items-center">
           <Link
             href="/auth/login"
@@ -128,12 +149,12 @@ const RegisterView = () => {
           >
             Already have an account? Login
           </Link>
-          <button
-            type="submit"
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          >
-            Login
-          </button>
+          <Button 
+          type="submit"
+          className="text-white">
+             {loading ? 'Loading...' : 'Register'}
+          </Button>
+
         </div>
         <div></div>
       </form>

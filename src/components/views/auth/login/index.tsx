@@ -27,7 +27,7 @@ const LoginViews = () => {
 
         try {
             const res = await signIn('credentials', {
-                redirect: false,
+                redirect: true,
                 email: form.email.value,
                 password: form.password.value,
                 callbackUrl

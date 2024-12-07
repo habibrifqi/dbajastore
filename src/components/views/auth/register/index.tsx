@@ -1,6 +1,7 @@
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import  authServices  from "@/services/auth";
+import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { FormEvent, useState } from "react";
@@ -55,25 +56,37 @@ const RegisterView = () => {
         //     },
         //     body: JSON.stringify(data)
         // });
+     
 
-        const result = await authServices.registerAccount(data);
-
-        if (result.status === 200) {
-            form.reset();
-            push('/auth/login');
-        }else{
-          const responseData = await result.json();
-          console.log(responseData.message);
-          if (result.status === 409) {
-            newErrors.password = 'Email Sudah digunakan';
-            data.password = ''; // Reset password if validation fails
-            form.password.value = '';
-            setErrors(newErrors);
+          // Jalankan fungsi register account dari service auth
+          try {
+            const result = await authServices.registerAccount(data);
+            // Jika berhasil maka reset form dan redirect ke halaman login
+            if (result.status === 200) {
+              form.reset();
+              push('/auth/login');
+            }
+          } catch (error) {
+            // Jika terjadi error maka tangani error tersebut
+            if (axios.isAxiosError(error)) {
+              // Ambil pesan error dari response server
+              const errorMessage = error.response?.data?.message || 'Terjadi kesalahan';
+              // Reset password jika terjadi error
+              data.password = '';
+              // Reset value input password di form
+              form.password.value = '';
+              // Set error di state errors
+              setErrors({ password: errorMessage });
+            } else {
+              // Jika error tidak terduga maka log error tersebut
+              console.error('Error tidak terduga:', error);
+            }
+          } finally {
+            // Set loading menjadi false setelah selesai menjalankan fungsi
             setLoading(false);
-            return;
           }
-          console.log(result)
-        }
+
+
 
     }
 

@@ -9,7 +9,7 @@ export default async function handler  (req:NextApiRequest, res:NextApiResponse)
                 res.status(200).json({status: true, statusCode:200 , message:"success"})
             }else{
                 if (message && message == 'EmailonUse') {
-                    res.status(409).json({status: true, statusCode:409 , message:"Email Already Used"})
+                    res.status(400).json({status: true, statusCode:400 , message:"Email Sudah Digunakan"})
                 }
                 res.status(400).json({status: true, statusCode:400 , message:"failed"})
             }
